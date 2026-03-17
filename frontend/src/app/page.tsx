@@ -65,7 +65,7 @@ export default function Home() {
 
   return (
     <main className="min-h-[calc(100vh-3.5rem)] bg-background">
-      <div className="container py-6">
+      <div className="container mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         {!analysisResult ? (
           <div className="mx-auto max-w-2xl space-y-6">
             <div className="text-center">
@@ -86,7 +86,9 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <DashboardResult data={analysisResult} onReplaceImage={handleReplaceImage} />
+          <div className="mx-auto w-full max-w-6xl">
+            <DashboardResult data={analysisResult} onReplaceImage={handleReplaceImage} />
+          </div>
         )}
       </div>
 
