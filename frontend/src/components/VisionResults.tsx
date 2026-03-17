@@ -44,14 +44,14 @@ export function VisionResults({ data }: VisionResultsProps) {
             </div>
           )}
 
-          {tags.dominant_mood && (
+          {tags.dominant_mood != null && String(tags.dominant_mood) !== "" ? (
             <div>
               <p className="text-sm text-muted-foreground">Dominant mood</p>
               <p className="mt-1 text-foreground">{String(tags.dominant_mood)}</p>
             </div>
-          )}
+          ) : null}
 
-          {tags.visible_subjects && Array.isArray(tags.visible_subjects) && (
+          {Array.isArray(tags.visible_subjects) && tags.visible_subjects.length > 0 ? (
             <div>
               <p className="text-sm text-muted-foreground">Visible subjects</p>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -62,42 +62,42 @@ export function VisionResults({ data }: VisionResultsProps) {
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
-          {tags.color_observations && (
+          {tags.color_observations != null && String(tags.color_observations) !== "" ? (
             <div>
               <p className="text-sm text-muted-foreground">Color observations</p>
               <p className="mt-1 text-foreground">{String(tags.color_observations)}</p>
             </div>
-          )}
+          ) : null}
 
-          {tags.design_observations && (
+          {tags.design_observations != null && String(tags.design_observations) !== "" ? (
             <div>
               <p className="text-sm text-muted-foreground">Design observations</p>
               <p className="mt-1 text-foreground">{String(tags.design_observations)}</p>
             </div>
-          )}
+          ) : null}
 
-          {tags.seasonal_indicators && (
+          {tags.seasonal_indicators != null && String(tags.seasonal_indicators) !== "" ? (
             <div>
               <p className="text-sm text-muted-foreground">Seasonal indicators</p>
               <p className="mt-1 text-foreground">{String(tags.seasonal_indicators)}</p>
             </div>
-          )}
+          ) : null}
 
-          {tags.style_indicators && (
+          {tags.style_indicators != null && String(tags.style_indicators) !== "" ? (
             <div>
               <p className="text-sm text-muted-foreground">Style indicators</p>
               <p className="mt-1 text-foreground">{String(tags.style_indicators)}</p>
             </div>
-          )}
+          ) : null}
 
-          {tags.text_present !== undefined && tags.text_present !== null && (
+          {tags.text_present !== undefined && tags.text_present !== null ? (
             <div>
               <p className="text-sm text-muted-foreground">Text present</p>
               <p className="mt-1 text-foreground">{String(tags.text_present)}</p>
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </motion.div>
