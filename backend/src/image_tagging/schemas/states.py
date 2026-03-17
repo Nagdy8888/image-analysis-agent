@@ -15,5 +15,6 @@ class ImageTaggingState(TypedDict, total=False):
     validated_tags: dict
     flagged_tags: list
     tag_record: dict
+    needs_review: bool
     processing_status: Literal["pending", "complete", "needs_review", "failed"]
     error: Optional[str]

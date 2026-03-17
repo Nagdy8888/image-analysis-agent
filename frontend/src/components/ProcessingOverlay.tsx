@@ -4,8 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Sparkles, Check } from "lucide-react";
 
 const STEPS = [
-  { label: "Uploading image...", icon: Loader2 },
+  { label: "Uploading...", icon: Loader2 },
+  { label: "Preprocessing...", icon: Loader2 },
   { label: "Analyzing with AI...", icon: Sparkles },
+  { label: "Tagging 8 categories...", icon: Sparkles },
+  { label: "Validating...", icon: Loader2 },
   { label: "Complete!", icon: Check },
 ];
 

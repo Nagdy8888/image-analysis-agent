@@ -12,7 +12,7 @@ flowchart TD
         G["[done] Preprocessor Node"]
         H["[done] Vision Node"]
         I["[done] Tagger Nodes"]
-        J["[ ] Validator plus Filter plus Aggregator"]
+        J["[done] Validator plus Filter plus Aggregator"]
         K["[done] Graph Builder"]
         L["[done] Entry Point"]
         A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L
@@ -40,4 +40,4 @@ flowchart TD
 ```
 
 **Last updated:** 2025-03-17  
-**Currently working on:** Phase 2 complete; Phase 3 (parallel taggers, validator, filter, aggregator) next
+**Currently working on:** Phase 3 complete; Phase 4 (Supabase integration) next

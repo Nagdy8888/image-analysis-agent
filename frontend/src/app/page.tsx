@@ -1,19 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingOverlay } from "@/components/ProcessingOverlay";
 import { VisionResults } from "@/components/VisionResults";
+import { TagCategories } from "@/components/TagCategories";
+import { FlaggedTags } from "@/components/FlaggedTags";
 import { JsonViewer } from "@/components/JsonViewer";
 import { Button } from "@/components/ui/button";
 import { API_BASE_URL } from "@/lib/constants";
 import type { AnalyzeImageResponse } from "@/lib/types";
+
+const MAX_STEP = 6;
 
 export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeImageResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const stepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!isProcessing) return;
+    stepTimerRef.current = setInterval(() => {
+      setCurrentStep((s) => (s < MAX_STEP - 1 ? s + 1 : s));
+    }, 3500);
+    return () => {
+      if (stepTimerRef.current) clearInterval(stepTimerRef.current);
+    };
+  }, [isProcessing]);
 
   async function handleAnalyze(file: File) {
     setError(null);
@@ -22,7 +37,6 @@ export default function Home() {
 
     const formData = new FormData();
     formData.append("file", file);
-
     setCurrentStep(2);
 
     try {
@@ -37,7 +51,7 @@ export default function Home() {
       }
 
       const data: AnalyzeImageResponse = await res.json();
-      setCurrentStep(3);
+      setCurrentStep(MAX_STEP);
       await new Promise((r) => setTimeout(r, 500));
       setAnalysisResult(data);
     } catch (e) {
@@ -74,7 +88,17 @@ export default function Home() {
         {analysisResult && (
           <div className="space-y-6">
             <VisionResults data={analysisResult} />
-            <JsonViewer data={analysisResult.vision_raw_tags} />
+            {analysisResult.tags_by_category && Object.keys(analysisResult.tags_by_category).length > 0 && (
+              <TagCategories tagsByCategory={analysisResult.tags_by_category} />
+            )}
+            {analysisResult.flagged_tags && analysisResult.flagged_tags.length > 0 && (
+              <FlaggedTags flagged={analysisResult.flagged_tags} />
+            )}
+            <JsonViewer
+              data={
+                analysisResult.tag_record ?? analysisResult.vision_raw_tags
+              }
+            />
             <Button variant="outline" onClick={handleReset}>
               Analyze New Image
             </Button>

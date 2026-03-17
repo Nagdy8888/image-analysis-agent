@@ -103,7 +103,7 @@ export function VisionResults({ data }: VisionResultsProps) {
         </CardContent>
       </Card>
 
-      {pipelineTags.length > 0 && (
+      {pipelineTags.length > 0 && !data.tags_by_category && (
         <div className="space-y-4 md:col-span-2">
           <h2 className="text-lg font-semibold">Pipeline tags</h2>
           <div className="grid gap-4 sm:grid-cols-2">

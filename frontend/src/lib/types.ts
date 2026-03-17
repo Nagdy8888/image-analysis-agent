@@ -5,11 +5,50 @@ export interface PartialTagResult {
   confidence_scores: Record<string, number>;
 }
 
+/** Tag with confidence (from tags_by_category). */
+export interface TagWithConfidence {
+  value: string;
+  confidence: number;
+}
+
+/** Hierarchical tag (parent/child). */
+export interface HierarchicalTag {
+  parent: string;
+  child: string;
+}
+
+/** Final tag record from aggregator. */
+export interface TagRecord {
+  image_id: string;
+  season: string[];
+  theme: string[];
+  objects: HierarchicalTag[];
+  dominant_colors: HierarchicalTag[];
+  design_elements: string[];
+  occasion: string[];
+  mood: string[];
+  product_type: HierarchicalTag | null;
+  needs_review: boolean;
+  processed_at: string;
+}
+
+/** Flagged tag (low confidence or invalid). */
+export interface FlaggedTag {
+  category: string;
+  value: string;
+  confidence: number;
+  reason: string;
+}
+
 export interface AnalyzeImageResponse {
   image_url: string;
   image_id: string;
   vision_description: string;
   vision_raw_tags: Record<string, unknown>;
-  /** Pipeline tagger results (e.g. season). */
   partial_tags?: PartialTagResult[];
+  /** Category -> list of { value, confidence } (from validated tags). */
+  tags_by_category?: Record<string, TagWithConfidence[]>;
+  tag_record?: TagRecord | null;
+  flagged_tags?: FlaggedTag[];
+  processing_status?: "complete" | "needs_review" | "failed";
 }

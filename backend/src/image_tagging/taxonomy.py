@@ -123,3 +123,14 @@ def get_flat_values(category: str) -> list[str]:
             out.extend(children)
         return out
     return []
+
+
+def get_parent_for_child(category: str, child: str) -> str | None:
+    """For hierarchical categories, return the parent key for a child value, or None."""
+    val = TAXONOMY.get(category)
+    if not isinstance(val, dict):
+        return None
+    for parent, children in val.items():
+        if child in children:
+            return parent
+    return None

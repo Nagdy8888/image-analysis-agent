@@ -88,10 +88,32 @@ async def analyze_image(request: Request, file: UploadFile = File(..., alias="fi
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
 
+    # tags_by_category: dict category -> list of {value, confidence} (from validated or partial)
+    validated = result.get("validated_tags") or {}
+    partial = result.get("partial_tags") or []
+    tags_by_category = {}
+    for cat, tag_list in validated.items():
+        tags_by_category[cat] = [
+            {"value": t.get("value"), "confidence": t.get("confidence", 0)}
+            for t in tag_list if isinstance(t, dict)
+        ]
+    if not tags_by_category and partial:
+        for item in partial:
+            if isinstance(item, dict) and item.get("category"):
+                cat = item["category"]
+                scores = item.get("confidence_scores") or {}
+                tags_by_category[cat] = [
+                    {"value": v, "confidence": scores.get(v, 0)} for v in (item.get("tags") or [])
+                ]
+
     return {
         "image_url": result.get("image_url", image_url),
         "image_id": result.get("image_id", image_id),
         "vision_description": result.get("vision_description", ""),
         "vision_raw_tags": result.get("vision_raw_tags", {}),
         "partial_tags": result.get("partial_tags", []),
+        "tags_by_category": tags_by_category,
+        "tag_record": result.get("tag_record"),
+        "flagged_tags": result.get("flagged_tags", []),
+        "processing_status": result.get("processing_status", "complete"),
     }
