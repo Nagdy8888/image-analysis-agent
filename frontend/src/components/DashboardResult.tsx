@@ -164,7 +164,9 @@ export function DashboardResult({ data, onReplaceImage }: DashboardResultProps) 
         )}
       </section>
 
-      {flagged.length > 0 && <FlaggedTags flagged={flagged} />}
+      <section className="rounded-lg border border-border/60 bg-card/80 p-4">
+        <FlaggedTags flagged={flagged} />
+      </section>
 
       <JsonViewer data={data.tag_record ?? data.vision_raw_tags} />
     </motion.div>
