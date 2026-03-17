@@ -51,4 +51,23 @@ export interface AnalyzeImageResponse {
   tag_record?: TagRecord | null;
   flagged_tags?: FlaggedTag[];
   processing_status?: "complete" | "needs_review" | "failed";
+  saved_to_db?: boolean;
+}
+
+/** Stored row from GET /api/tag-images */
+export interface TagImageRow {
+  image_id: string;
+  tag_record: TagRecord | Record<string, unknown>;
+  search_index?: string[];
+  image_url?: string | null;
+  needs_review: boolean;
+  processing_status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TagImagesListResponse {
+  items: TagImageRow[];
+  limit: number;
+  offset: number;
 }

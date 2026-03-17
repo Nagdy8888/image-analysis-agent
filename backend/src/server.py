@@ -88,6 +88,28 @@ async def analyze_image(request: Request, file: UploadFile = File(..., alias="fi
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
 
+    # Persist to DB when Supabase is enabled
+    saved_to_db = False
+    try:
+        from src.services.supabase import SUPABASE_ENABLED, get_client
+        if SUPABASE_ENABLED:
+            client = get_client()
+            if client:
+                tag_record = result.get("tag_record")
+                if isinstance(tag_record, dict):
+                    client.upsert_tag_record(
+                        image_id=result.get("image_id", image_id),
+                        tag_record=tag_record,
+                        image_url=image_url,
+                        needs_review=bool(result.get("flagged_tags")),
+                        processing_status=result.get("processing_status", "complete"),
+                    )
+                    saved_to_db = True
+    except Exception as e:
+        # Log but do not fail the request
+        import logging
+        logging.getLogger(__name__).warning("Failed to save tag record to DB: %s", e)
+
     # tags_by_category: dict category -> list of {value, confidence} (from validated or partial)
     validated = result.get("validated_tags") or {}
     partial = result.get("partial_tags") or []
@@ -116,4 +138,39 @@ async def analyze_image(request: Request, file: UploadFile = File(..., alias="fi
         "tag_record": result.get("tag_record"),
         "flagged_tags": result.get("flagged_tags", []),
         "processing_status": result.get("processing_status", "complete"),
+        "saved_to_db": saved_to_db,
     }
+
+
+@app.get("/api/tag-image/{image_id}")
+def get_tag_image(image_id: str):
+    """Return stored tag record for an image. 503 if DB disabled, 404 if not found."""
+    try:
+        from src.services.supabase import SUPABASE_ENABLED, get_client
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Database not available")
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    client = get_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database not available")
+    row = client.get_tag_record(image_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return row
+
+
+@app.get("/api/tag-images")
+def list_tag_images(limit: int = 20, offset: int = 0):
+    """List recently tagged images. 503 if DB disabled."""
+    try:
+        from src.services.supabase import SUPABASE_ENABLED, get_client
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Database not available")
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    client = get_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database not available")
+    rows = client.list_tag_images(limit=limit, offset=offset)
+    return {"items": rows, "limit": limit, "offset": offset}

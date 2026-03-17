@@ -8,7 +8,7 @@ flowchart TD
         C["[done] Taxonomy"]
         D["[done] Schemas"]
         E["[done] Prompts"]
-        F["[ ] Supabase Service"]
+        F["[done] Supabase Service"]
         G["[done] Preprocessor Node"]
         H["[done] Vision Node"]
         I["[done] Tagger Nodes"]
@@ -40,4 +40,4 @@ flowchart TD
 ```
 
 **Last updated:** 2025-03-17  
-**Currently working on:** Phase 3 complete; Phase 4 (Supabase integration) next
+**Currently working on:** Phase 4 complete (Supabase integration + persistence)

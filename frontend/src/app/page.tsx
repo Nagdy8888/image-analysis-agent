@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingOverlay } from "@/components/ProcessingOverlay";
 import { DashboardResult } from "@/components/DashboardResult";
+import { HistoryGrid } from "@/components/HistoryGrid";
 import { API_BASE_URL } from "@/lib/constants";
 import type { AnalyzeImageResponse } from "@/lib/types";
 
@@ -50,6 +52,9 @@ export default function Home() {
       setCurrentStep(MAX_STEP);
       await new Promise((r) => setTimeout(r, 500));
       setAnalysisResult(data);
+      if (data.saved_to_db) {
+        toast.success("Analysis saved to database");
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -90,6 +95,8 @@ export default function Home() {
             <DashboardResult data={analysisResult} onReplaceImage={handleReplaceImage} />
           </div>
         )}
+
+        <HistoryGrid />
       </div>
 
       <ProcessingOverlay isVisible={isProcessing} currentStep={currentStep} />

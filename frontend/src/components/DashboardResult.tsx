@@ -64,9 +64,16 @@ export function DashboardResult({ data, onReplaceImage }: DashboardResultProps) 
       <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
         <section className="rounded-lg border border-border/60 bg-card/80 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Product Image
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Product Image
+              </h2>
+              {data.saved_to_db && (
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-400">
+                  Saved
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
