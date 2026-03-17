@@ -1,0 +1,49 @@
+---
+description: Log errors to docs/errors/NNN-description.md
+globs: 
+alwaysApply: false
+---
+
+# Error Logging Rule
+
+When encountering an error during coding (syntax, logic, runtime, or configuration), create a markdown file in `docs/errors/` documenting it.
+
+## File naming
+
+`docs/errors/NNN-short-description.md` where NNN is a zero-padded sequential number.
+
+Example: `docs/errors/001-import-circular-dependency.md`
+
+## File template
+
+```markdown
+# Error: <short title>
+
+**Date:** YYYY-MM-DD
+**File(s):** `path/to/file.py`
+**Type:** syntax | logic | runtime | config | dependency
+
+## Error Message
+
+<paste the exact error traceback or message>
+
+## Root Cause
+
+<1-2 sentences explaining why this happened>
+
+## Solution
+
+<what was changed to fix it, with code snippets if helpful>
+
+## Prevention
+
+<how to avoid this in the future, if applicable>
+```
+
+## Rules
+
+- Create one `.md` file per distinct error (do not group unrelated errors).
+- Always include the exact error message or traceback.
+- Keep the root cause and solution concise and actionable.
+- If the same error recurs, update the existing file instead of creating a duplicate.
+- Reference the error doc number in commit messages when relevant (e.g., `fix: resolve circular import (see errors/001)`).

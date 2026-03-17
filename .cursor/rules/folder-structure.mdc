@@ -1,0 +1,43 @@
+---
+description: Follow FOLDER_STRUCTURE.md; agent layout under src/<agent_name>/
+globs: 
+alwaysApply: false
+---
+
+# Folder Structure Enforcement
+
+Follow the template in `FOLDER_STRUCTURE.md` for all structural decisions.
+
+## Agent Packages
+
+When adding a new agent, create `src/<agent_name>/` with these subfolders:
+
+```
+src/<agent_name>/
+├── __init__.py
+├── <agent_name>.py        # Graph entry point (compiled graph export)
+├── graph_builder.py       # Graph construction (nodes, edges, conditionals)
+├── configuration.py       # Runtime configuration
+├── settings.py            # Agent-level env vars
+├── nodes/                 # One file per node or group of related nodes
+├── prompts/               # Prompt templates separated by task
+├── schemas/               # TypedDict / Pydantic state and data models
+└── tools/                 # @tool functions + get_tools() assembly
+```
+
+## Placement Rules
+
+- New graph nodes go in `<agent>/nodes/` -- never in `graph_builder.py`.
+- New prompt templates go in `<agent>/prompts/` -- never inline in node code.
+- New data models go in `<agent>/schemas/` -- never defined inside nodes.
+- Taxonomy/enum values go only in `taxonomy.py` (single source of truth).
+- Shared integrations (used by 2+ agents) go in `src/services/<name>/`.
+- Agent-specific tools stay in `<agent>/tools/`.
+- No business logic in `__init__.py` files -- only re-exports.
+
+## Registering a New Agent
+
+1. Export compiled graph from `<agent_name>.py`.
+2. Register in `langgraph.json` under `"graphs"`.
+3. Add tests in `tests/`.
+4. Update docs in `docs/`.

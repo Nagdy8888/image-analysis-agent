@@ -1,0 +1,33 @@
+---
+description: Every folder must have a README.md with Contents table
+globs: 
+alwaysApply: false
+---
+
+# Folder README Rule
+
+Every folder and subfolder in the project must contain a `README.md` file.
+
+## README Template
+
+```markdown
+# <Folder Name>
+
+<1-2 sentence description of what this folder contains and its role in the project.>
+
+## Contents
+
+| File | Description |
+|------|-------------|
+| `filename.py` | Brief description |
+| `subfolder/` | Brief description |
+```
+
+## Rules
+
+- Create a `README.md` when creating a new folder.
+- When adding, removing, or renaming a file in a folder, update that folder's `README.md` to reflect the change.
+- Keep descriptions concise -- one line per file.
+- For subfolders, describe the subfolder's purpose, not its individual files (those are covered by the subfolder's own README).
+- Do not document `__init__.py` or `__pycache__/` in the contents table.
+- The root project `README.md` should provide a high-level overview and link to `docs/quickstart/README.md` for setup instructions.

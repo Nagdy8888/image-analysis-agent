@@ -1,0 +1,105 @@
+"use client";
+
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { AnalyzeImageResponse } from "@/lib/types";
+
+interface VisionResultsProps {
+  data: AnalyzeImageResponse;
+}
+
+export function VisionResults({ data }: VisionResultsProps) {
+  const { image_url, vision_description, vision_raw_tags } = data;
+  const tags = vision_raw_tags || {};
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="grid w-full gap-6 md:grid-cols-2"
+    >
+      <div className="relative aspect-square max-h-[400px] w-full overflow-hidden rounded-lg border bg-muted shadow-md">
+        <Image
+          src={image_url}
+          alt="Uploaded"
+          fill
+          className="object-contain"
+          unoptimized
+          sizes="400px"
+        />
+      </div>
+
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold">AI Analysis</h2>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {vision_description && (
+            <div>
+              <p className="text-sm text-muted-foreground">Description</p>
+              <p className="mt-1 text-foreground">{vision_description}</p>
+            </div>
+          )}
+
+          {tags.dominant_mood && (
+            <div>
+              <p className="text-sm text-muted-foreground">Dominant mood</p>
+              <p className="mt-1 text-foreground">{String(tags.dominant_mood)}</p>
+            </div>
+          )}
+
+          {tags.visible_subjects && Array.isArray(tags.visible_subjects) && (
+            <div>
+              <p className="text-sm text-muted-foreground">Visible subjects</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(tags.visible_subjects as string[]).map((s) => (
+                  <Badge key={s} variant="secondary">
+                    {s}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {tags.color_observations && (
+            <div>
+              <p className="text-sm text-muted-foreground">Color observations</p>
+              <p className="mt-1 text-foreground">{String(tags.color_observations)}</p>
+            </div>
+          )}
+
+          {tags.design_observations && (
+            <div>
+              <p className="text-sm text-muted-foreground">Design observations</p>
+              <p className="mt-1 text-foreground">{String(tags.design_observations)}</p>
+            </div>
+          )}
+
+          {tags.seasonal_indicators && (
+            <div>
+              <p className="text-sm text-muted-foreground">Seasonal indicators</p>
+              <p className="mt-1 text-foreground">{String(tags.seasonal_indicators)}</p>
+            </div>
+          )}
+
+          {tags.style_indicators && (
+            <div>
+              <p className="text-sm text-muted-foreground">Style indicators</p>
+              <p className="mt-1 text-foreground">{String(tags.style_indicators)}</p>
+            </div>
+          )}
+
+          {tags.text_present !== undefined && tags.text_present !== null && (
+            <div>
+              <p className="text-sm text-muted-foreground">Text present</p>
+              <p className="mt-1 text-foreground">{String(tags.text_present)}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}

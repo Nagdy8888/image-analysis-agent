@@ -1,0 +1,76 @@
+---
+description: All docs live in docs/ with subfolders; keep in sync
+globs: 
+alwaysApply: false
+---
+
+# Documentation Structure
+
+All project documentation lives in `docs/` with five subfolders. Every subfolder has its own `README.md` as an index.
+
+```
+docs/
+├── README.md                      # Index: what each subfolder contains, links to everything
+│
+├── curriculum/                    # For fresh engineers: step-by-step learning path (concepts + code)
+│   ├── README.md                  # Curriculum index: reading order, one-line description per lesson
+│   ├── 01-project-overview.md      # (example) What the project does, high-level flow
+│   ├── 02-...md                   # Numbered lessons: concept first, then where in code; detailed & clear
+│   └── NN-topic-name.md           # One main idea per file; define terms; cross-link "Next"
+│
+├── quickstart/                    # For anyone: get running fast
+│   ├── README.md                  # Subfolder index
+│   ├── SETUP.md                   # Clone, install, .env config, run locally (commands only)
+│   ├── DEPLOY.md                  # Deploy overview (options and links)
+│   ├── DOCKER_SETUP.md            # Full Docker guide: build, run, compose, logs, registry
+│   └── IMAGE_UPLOAD_GUIDE.md      # Upload guide: formats, UI, API curl, notebook, batch
+│
+├── architecture/                  # For developers: deep technical reference
+│   ├── README.md                  # Subfolder index
+│   ├── OVERVIEW.md                # System architecture + mermaid graph flow diagram
+│   ├── GRAPH_NODES.md             # Every LangGraph node: purpose, inputs, outputs
+│   ├── TAXONOMY.md                # Full tag enum reference (all 8 categories)
+│   ├── DATABASE.md                # Supabase schema, tables, indexing, example queries
+│   ├── API.md                     # FastAPI endpoints: routes, request/response examples
+│   ├── FRONTEND.md                # Next.js components, UI structure, customization
+│   └── PROMPTS.md                 # LLM prompt templates, tuning tips
+│
+├── reports/                       # For manager: summaries and status
+│   ├── README.md                  # Subfolder index
+│   ├── PROJECT_SUMMARY.md         # Executive summary: problem, solution, outcome
+│   ├── FEATURES.md                # Feature checklist (done/in-progress/planned)
+│   ├── DECISIONS.md               # Key technical decisions and rationale
+│   └── PROGRESS.md                # Mermaid diagram of implementation status
+│
+├── errors/                        # Troubleshooting knowledge base
+│   ├── README.md                  # Subfolder index
+│   └── NNN-error-description.md   # Created as errors occur during development
+│
+└── plans/                         # Phase-by-phase setup guides
+    ├── README.md                  # Subfolder index (links to all phase guides)
+    ├── phase-0-setup.md           # Project skeleton setup
+    ├── phase-1-setup.md           # Vision analysis + React UI
+    ├── phase-2-setup.md           # Season tagger
+    ├── phase-3-setup.md           # All 8 parallel taggers
+    ├── phase-4-setup.md           # Validation & confidence
+    ├── phase-5-setup.md           # Supabase integration
+    └── phase-6-setup.md           # Production + Docker + polish
+```
+
+Additionally, `CHANGELOG.md` lives at the project root.
+
+## Rules
+
+- Maintain the curriculum under `docs/curriculum/` per the **curriculum-learning** rule: numbered lesson files, concept-first and code-second, detailed and clear for a fresh engineer.
+- When adding a new node or modifying graph logic, update `architecture/GRAPH_NODES.md` and `architecture/OVERVIEW.md`.
+- When changing the database schema, update `architecture/DATABASE.md`.
+- When adding or modifying API endpoints, update `architecture/API.md`.
+- When changing prompts, update `architecture/PROMPTS.md`.
+- When adding new dependencies or setup steps, update `quickstart/SETUP.md`.
+- When changing Docker config (Dockerfile, ports, env vars), update `quickstart/DOCKER_SETUP.md`.
+- When changing image upload flow (formats, size limits, endpoints), update `quickstart/IMAGE_UPLOAD_GUIDE.md`.
+- When a feature is completed, mark it done in `reports/FEATURES.md`.
+- When a significant technical decision is made, document it in `reports/DECISIONS.md`.
+- Use mermaid diagrams in architecture docs for flows and relationships.
+- Keep quickstart docs command-focused with minimal explanation.
+- Keep reports docs non-technical and concise for manager readability.

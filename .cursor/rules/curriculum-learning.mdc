@@ -1,0 +1,68 @@
+---
+description: Curriculum learning docs - numbered lessons under docs/curriculum/
+globs: 
+alwaysApply: false
+---
+
+# Curriculum Learning Docs
+
+A **curriculum** is a structured set of markdown files under `docs/curriculum/` that teach a fresh engineer the concepts and the code of this project. Each file is one lesson; together they form an ordered learning path.
+
+## Folder and File Requirements
+
+- **Location:** `docs/curriculum/` (under the main `docs/` folder).
+- **Index:** `docs/curriculum/README.md` must exist and:
+  - Have a heading "Learning Curriculum".
+  - Briefly explain that these docs are for understanding the project as a new engineer.
+  - List all curriculum files in **reading order** with a one-sentence description of each.
+  - Suggest reading in order (01, 02, 03, …) for best understanding.
+
+- **Lesson files:** Use **numbered filenames** so order is obvious, e.g.:
+  - `01-project-overview.md`
+  - `02-langgraph-basics.md`
+  - `03-state-and-nodes.md`
+  - `04-vision-and-taggers.md`
+  - `05-database-and-search.md`
+  - `06-frontend-and-api.md`
+  (Adjust names to match the actual project; keep the numbering.)
+
+- When adding a new major concept or subsystem, add or update a curriculum file and list it in `docs/curriculum/README.md`.
+
+## Content Rules (Every Curriculum MD File)
+
+Write for a **fresh engineer**: assume they are new to the stack (e.g. LangGraph, FastAPI, Next.js, Supabase) but can read code.
+
+1. **Concept first, code second**
+   - Start with *what* the concept is and *why* it matters in this project.
+   - Then point to *where* it lives in the codebase (file paths, key functions or components).
+   - Use short paragraphs (2–4 sentences); avoid long walls of text.
+
+2. **Be explicit and concrete**
+   - Use real file paths (e.g. `src/image_tagging/graph_builder.py`), real function/component names, and real data flow (e.g. "Request hits `POST /api/analyze-image` → server reads file → builds state → invokes graph").
+   - When explaining a flow, list steps in order. Use bullet lists or numbered lists for sequences.
+
+3. **Define terms once**
+   - The first time you use a term (e.g. "node", "state", "reducer", "tag record"), define it in one clear sentence before using it again.
+   - Avoid jargon without explanation.
+
+4. **No code snippets required**
+   - Prefer prose: "The preprocessor node lives in `src/image_tagging/nodes/preprocessor.py` and validates the image, resizes it, and converts it to base64."
+   - If you add a short code snippet, always add one sentence before or after explaining what it does and how it fits the concept.
+
+5. **One main idea per file**
+   - Each curriculum file should focus on one topic (e.g. "How the graph is built", "How tags are stored in the database"). Split broad topics into multiple numbered files.
+
+6. **Cross-link**
+   - At the end of a file, add a short "Next" line (e.g. "Next: [02-langgraph-basics.md](02-langgraph-basics.md)") so the reader can follow the path.
+
+## When to Create or Update Curriculum Docs
+
+- When implementing a new phase or feature that introduces a new concept (e.g. "cascading filters", "LangGraph Send API"), add or update the relevant curriculum file and list it in `docs/curriculum/README.md`.
+- When an existing concept is refactored or moved, update the curriculum file that describes it so paths and names stay accurate.
+- Keep the curriculum in sync with the code: if the code changes, the curriculum should still describe the current behavior and structure.
+
+## Summary
+
+- **Folder:** `docs/curriculum/` with `README.md` and numbered `NN-topic-name.md` files.
+- **Audience:** Fresh engineer learning concepts and code.
+- **Style:** Detailed, clear, concept-first then code; explicit paths and flows; one main idea per file; define terms; optional short snippets with explanation; cross-link to "Next".

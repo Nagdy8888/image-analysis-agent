@@ -1,0 +1,75 @@
+---
+description: Keep docs/reports/PROGRESS.md mermaid diagram up to date
+globs: 
+alwaysApply: false
+---
+
+# Progress Diagram
+
+Maintain a living mermaid diagram in `docs/reports/PROGRESS.md` that visualizes the current implementation progress.
+
+## Rules
+
+- After completing any todo or implementation step, update the diagram in `docs/reports/PROGRESS.md`.
+- Each node in the diagram represents a major task (project setup, schemas, nodes, frontend, etc.).
+- Node labels must include the task name and its status.
+- Use subgraphs to group related steps (Backend, Frontend, Docs, etc.).
+- Keep a "Current Step" marker pointing to what is being worked on right now.
+
+## Status Markers
+
+Use these prefixes in node labels to indicate status:
+
+- Completed: `"[done] Task Name"`
+- In Progress: `"[NOW] Task Name"`
+- Pending: `"[ ] Task Name"`
+
+## Example
+
+The diagram should follow this pattern:
+
+````markdown
+# Implementation Progress
+
+```mermaid
+flowchart TD
+    subgraph Backend ["Backend Agent"]
+        A["[done] Project Setup"]
+        B["[done] Settings & Config"]
+        C["[NOW] Taxonomy"]
+        D["[ ] Schemas"]
+        E["[ ] Prompts"]
+        F["[ ] Supabase Service"]
+        G["[ ] Preprocessor Node"]
+        H["[ ] Vision Node"]
+        I["[ ] Tagger Nodes"]
+        J["[ ] Validator + Filter + Aggregator"]
+        K["[ ] Graph Builder"]
+        L["[ ] Entry Point"]
+        A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L
+    end
+
+    subgraph API ["API Layer"]
+        M["[ ] FastAPI Server"]
+        N["[ ] Docker"]
+        L --> M --> N
+    end
+
+    subgraph Frontend ["Next.js Dashboard"]
+        O["[ ] Project Setup"]
+        P["[ ] Components"]
+        Q["[ ] Integration"]
+        M --> O --> P --> Q
+    end
+
+    subgraph Documentation ["Docs"]
+        R["[ ] Quickstart"]
+        S["[ ] Architecture"]
+        T["[ ] Reports"]
+        R --> S --> T
+    end
+```
+
+**Last updated:** YYYY-MM-DD
+**Currently working on:** Task name
+````
