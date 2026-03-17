@@ -6,7 +6,7 @@ import base64
 import uuid
 from pathlib import Path
 
-from fastapi import File, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
