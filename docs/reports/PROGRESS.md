@@ -33,12 +33,12 @@ flowchart TD
     end
 
     subgraph Documentation ["Docs"]
-        R["[done] Quickstart"]
-        S["[ ] Architecture"]
-        T["[ ] Reports"]
-        R --> S --> T
+        R2["[done] Quickstart"]
+        S["[done] Architecture"]
+        T["[done] Reports"]
+        R2 --> S --> T
     end
 ```
 
 **Last updated:** 2025-03-17  
-**Currently working on:** Phase 5 complete (Search + bulk upload)
+**Currently working on:** Phase 6 complete (Polish + documentation)

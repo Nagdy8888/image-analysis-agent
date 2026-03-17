@@ -1,63 +1,58 @@
-# Docker Setup
+# Docker setup
 
-The project is intended to run with Docker. Backend and frontend each run in a container.
+Run the full stack with Docker Compose.
 
-## Prerequisites
+## Quick start
 
-- Docker and Docker Compose installed
-- Project root `.env` with at least `OPENAI_API_KEY` (for analysis in later phases)
-
-## Build and run
-
-From the **project root**:
+From the project root:
 
 ```bash
 docker compose up --build
 ```
 
-- **Frontend:** http://localhost:3000  
-- **Backend API:** http://localhost:8000  
-- **Health check:** http://localhost:8000/api/health  
+- **App:** http://localhost:3000  
+- **API:** http://localhost:8000  
 
-This is the standard way to run the Image Analysis Agent.  
+## Environment
 
-## Environment variables
+Create a `.env` file at the project root (same directory as `docker-compose.yml`):
 
-- **Backend** uses the root `.env` file via `env_file: .env` in docker-compose.
-- **Frontend** gets `NEXT_PUBLIC_API_URL` at **build time**. Default in docker-compose is `http://localhost:8000` so the browser (on your machine) can call the API.
-
-To use a different API URL (e.g. production backend), rebuild with a build arg:
-
-```bash
-docker compose build --build-arg NEXT_PUBLIC_API_URL=https://api.yoursite.com
-docker compose up -d
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o
+# Optional: Supabase/PostgreSQL for save and search
+DATABASE_URI=postgresql://user:password@host:5432/postgres
 ```
 
-## Persisted uploads
+The backend and frontend services both use this `.env` via `env_file`. The frontend build is given `NEXT_PUBLIC_API_URL=http://localhost:8000` so the browser can call the API on your machine.
 
-Uploaded images are stored in a Docker volume `backend_uploads`. They persist across `docker compose down`. To remove them:
+## Services
 
-```bash
-docker compose down -v
-```
+| Service   | Port | Description                    |
+|----------|------|--------------------------------|
+| backend  | 8000 | FastAPI + LangGraph, uploads  |
+| frontend | 3000 | Next.js app                   |
+
+Uploads are stored in a Docker volume `backend_uploads` so they persist across restarts.
 
 ## Logs and troubleshooting
 
-- View logs: `docker compose logs -f`
-- Backend only: `docker compose logs -f backend`
-- Restart after changing code: `docker compose up --build -d`
+- **View logs:** `docker compose logs -f`
+- **Rebuild after code changes:** `docker compose up --build`
+- **Backend fails on startup:** Check `.env` has `OPENAI_API_KEY`. Backend loads `.env` from the project root (mounted or copied at build time; for env vars, `env_file` passes them at run).
+- **Frontend build fails:** Fix any TypeScript/ESLint errors reported in the build output.
+- **Database (503):** If you see 503 on tag-images or search, the app is running without a DB. Set `DATABASE_URI` and run `backend/src/services/supabase/migration.sql` in your Supabase SQL editor, then restart: `docker compose up --build`.
 
-## Building for a registry
+## Pushing images to a registry
 
-To push images to a registry (e.g. for deployment):
+To build and push for a registry:
 
 ```bash
-# Tag and push (replace with your registry path)
 docker compose build
-docker tag image-analysis-agent-backend your-registry/image-analysis-agent-backend:latest
-docker tag image-analysis-agent-frontend your-registry/image-analysis-agent-frontend:latest
+docker tag image-analysis-agent-backend:latest your-registry/image-analysis-agent-backend:latest
+docker tag image-analysis-agent-frontend:latest your-registry/image-analysis-agent-frontend:latest
 docker push your-registry/image-analysis-agent-backend:latest
 docker push your-registry/image-analysis-agent-frontend:latest
 ```
 
-Run the backend with the same env vars (mount or pass `.env`). Run the frontend with `NEXT_PUBLIC_API_URL` set to the public URL of your backend.
+In production, set `NEXT_PUBLIC_API_URL` to the public URL of your backend (e.g. `https://api.yourdomain.com`) when building the frontend image.

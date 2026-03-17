@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatTagLabel } from "@/lib/formatTag";
 import type { TagImageRow } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export function SearchResults({ items, loading, onSelectItem }: SearchResultsPro
     return (
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="aspect-square animate-pulse rounded-lg bg-muted/50" />
+          <Skeleton key={i} className="aspect-square rounded-lg" />
         ))}
       </div>
     );

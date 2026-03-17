@@ -1,4 +1,5 @@
 """Vision analyzer node: single LLM vision pass → vision_description + vision_raw_tags (spec 4.2)."""
+import asyncio
 import json
 from typing import Any
 
@@ -55,16 +56,21 @@ async def vision_analyzer(state: ImageTaggingState) -> dict[str, Any]:
         ),
     ]
 
-    try:
-        response = await llm.ainvoke(messages)
-        text = response.content if isinstance(response.content, str) else str(response.content)
-    except Exception as e:
-        return {
-            "vision_description": "",
-            "vision_raw_tags": {},
-            "processing_status": "failed",
-            "error": str(e),
-        }
+    for attempt in range(3):
+        try:
+            response = await llm.ainvoke(messages)
+            text = response.content if isinstance(response.content, str) else str(response.content)
+            break
+        except Exception as e:
+            if attempt < 2:
+                await asyncio.sleep(1 * (2**attempt))
+            else:
+                return {
+                    "vision_description": "",
+                    "vision_raw_tags": {},
+                    "processing_status": "failed",
+                    "error": str(e),
+                }
 
     description, raw = _parse_vision_response(text)
     return {

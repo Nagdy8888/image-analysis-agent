@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { RefreshCw } from "lucide-react";
+import { ImageIcon, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/lib/constants";
 import type { TagImagesListResponse, TagImageRow } from "@/lib/types";
 
@@ -71,7 +72,7 @@ export function HistoryGrid() {
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-lg bg-muted/50" />
+            <Skeleton key={i} className="aspect-square rounded-lg" />
           ))}
         </div>
       </section>
@@ -105,7 +106,11 @@ export function HistoryGrid() {
         </p>
       )}
       {!error && !dbUnavailable && items.length === 0 && (
-        <p className="text-sm text-muted-foreground">No tagged images yet.</p>
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-muted/20 py-12 text-center">
+          <ImageIcon className="h-10 w-10 text-muted-foreground/60" aria-hidden />
+          <p className="mt-2 text-sm font-medium text-foreground">No tagged images yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">Analyze an image to see it here.</p>
+        </div>
       )}
       {!error && items.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">

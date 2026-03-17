@@ -12,4 +12,4 @@ Deep technical reference for developers.
 | FRONTEND.md | Next.js components and structure |
 | PROMPTS.md | LLM prompt templates |
 
-*(Docs will be populated in later phases.)*
+All architecture docs are populated. Start with OVERVIEW.md for the system diagram and flow.

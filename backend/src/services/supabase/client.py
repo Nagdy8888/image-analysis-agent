@@ -1,6 +1,7 @@
 """Supabase PostgreSQL client: upsert, get, list tag records."""
 import json
 import logging
+import time
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -53,8 +54,18 @@ class SupabaseClient:
         if not self._uri:
             raise ValueError("DATABASE_URI is required for SupabaseClient")
 
-    def _conn(self):
-        return psycopg2.connect(self._uri)
+    def _conn(self, retries: int = 3, delay: float = 1.0):
+        """Connect with retries; app continues without DB if connection fails (Phase 6)."""
+        last_error = None
+        for attempt in range(retries):
+            try:
+                return psycopg2.connect(self._uri)
+            except Exception as e:
+                last_error = e
+                logger.warning("DB connection attempt %s/%s failed: %s", attempt + 1, retries, e)
+                if attempt < retries - 1:
+                    time.sleep(delay)
+        raise last_error
 
     def upsert_tag_record(
         self,

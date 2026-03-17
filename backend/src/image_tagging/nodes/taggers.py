@@ -1,4 +1,5 @@
 """Category tagger nodes: run_tagger (generic) + tag_season (spec 4.3)."""
+import asyncio
 import json
 from typing import Any
 
@@ -46,10 +47,18 @@ async def run_tagger(
 
     prompt = build_tagger_prompt(description, category, allowed, instructions)
     llm = ChatOpenAI(model=OPENAI_MODEL, api_key=OPENAI_API_KEY)
-    try:
-        response = await llm.ainvoke([{"role": "user", "content": prompt}])
-        text = response.content if isinstance(response.content, str) else str(response.content)
-    except Exception:
+    text = None
+    for attempt in range(3):
+        try:
+            response = await llm.ainvoke([{"role": "user", "content": prompt}])
+            text = response.content if isinstance(response.content, str) else str(response.content)
+            break
+        except Exception:
+            if attempt < 2:
+                await asyncio.sleep(1 * (2**attempt))
+            else:
+                return {"partial_tags": [TagResult(category=category, tags=[], confidence_scores={}).model_dump()]}
+    if text is None:
         return {"partial_tags": [TagResult(category=category, tags=[], confidence_scores={}).model_dump()]}
 
     out = _parse_tagger_response(text)
