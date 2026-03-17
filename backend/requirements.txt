@@ -1,5 +1,6 @@
 fastapi
 uvicorn[standard]
+python-multipart
 langchain-core
 langchain-openai
 langgraph
