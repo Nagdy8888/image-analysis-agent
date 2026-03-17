@@ -1,12 +1,20 @@
 """
 FastAPI application: CORS, routes, static uploads.
 Phase 2: analyze-image uses LangGraph pipeline; GET /api/taxonomy added.
+Phase 5: search-images, available-filters, bulk-upload, bulk-status.
 """
+import asyncio
 import base64
+import logging
 import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+
+logger = logging.getLogger(__name__)
+
+# Phase 5: batch state for bulk upload (in-memory; key = batch_id)
+BATCH_STORAGE: dict[str, dict] = {}
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -174,3 +182,190 @@ def list_tag_images(limit: int = 20, offset: int = 0):
         raise HTTPException(status_code=503, detail="Database not available")
     rows = client.list_tag_images(limit=limit, offset=offset)
     return {"items": rows, "limit": limit, "offset": offset}
+
+
+def _parse_filter_params(
+    season: str | None = None,
+    theme: str | None = None,
+    objects: str | None = None,
+    dominant_colors: str | None = None,
+    design_elements: str | None = None,
+    occasion: str | None = None,
+    mood: str | None = None,
+    product_type: str | None = None,
+) -> dict[str, list[str]]:
+    """Parse comma-separated query params into filters dict."""
+    filters = {}
+    for key, param in [
+        ("season", season),
+        ("theme", theme),
+        ("objects", objects),
+        ("dominant_colors", dominant_colors),
+        ("design_elements", design_elements),
+        ("occasion", occasion),
+        ("mood", mood),
+        ("product_type", product_type),
+    ]:
+        if param:
+            values = [v.strip() for v in param.split(",") if v.strip()]
+            if values:
+                filters[key] = values
+    return filters
+
+
+@app.get("/api/search-images")
+def search_images(
+    season: str | None = None,
+    theme: str | None = None,
+    objects: str | None = None,
+    dominant_colors: str | None = None,
+    design_elements: str | None = None,
+    occasion: str | None = None,
+    mood: str | None = None,
+    product_type: str | None = None,
+    limit: int = 50,
+):
+    """Search images by tag filters (AND across categories). 503 if DB disabled."""
+    try:
+        from src.services.supabase import SUPABASE_ENABLED, get_client
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Database not available")
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    client = get_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database not available")
+    filters = _parse_filter_params(
+        season=season, theme=theme, objects=objects, dominant_colors=dominant_colors,
+        design_elements=design_elements, occasion=occasion, mood=mood, product_type=product_type,
+    )
+    rows = client.search_images_filtered(filters, limit=limit)
+    return {"items": rows, "limit": limit}
+
+
+@app.get("/api/available-filters")
+def available_filters(
+    season: str | None = None,
+    theme: str | None = None,
+    objects: str | None = None,
+    dominant_colors: str | None = None,
+    design_elements: str | None = None,
+    occasion: str | None = None,
+    mood: str | None = None,
+    product_type: str | None = None,
+):
+    """Return available filter values for current selection (cascading). 503 if DB disabled."""
+    try:
+        from src.services.supabase import SUPABASE_ENABLED, get_client
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Database not available")
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=503, detail="Database not configured")
+    client = get_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database not available")
+    filters = _parse_filter_params(
+        season=season, theme=theme, objects=objects, dominant_colors=dominant_colors,
+        design_elements=design_elements, occasion=occasion, mood=mood, product_type=product_type,
+    )
+    return client.get_available_filter_values(filters)
+
+
+async def _process_one_file(
+    request: Request,
+    filename_orig: str,
+    contents: bytes,
+    batch_id: str,
+    index: int,
+) -> None:
+    """Process a single file: save, run graph, save to DB. Updates BATCH_STORAGE[batch_id]."""
+    image_id = ""
+    try:
+        suffix = Path(filename_orig or "").suffix.lower()
+        if suffix not in ALLOWED_IMAGE_EXTENSIONS:
+            BATCH_STORAGE[batch_id]["results"][index] = {"image_id": "", "status": "failed", "error": "Invalid file type"}
+            BATCH_STORAGE[batch_id]["completed"] += 1
+            return
+        image_id = str(uuid.uuid4())
+        filename = f"{image_id}{suffix}"
+        filepath = UPLOADS_DIR / filename
+        filepath.write_bytes(contents)
+        base_url = str(request.base_url).rstrip("/")
+        image_url = f"{base_url}/uploads/{filename}"
+        image_base64 = base64.b64encode(contents).decode("utf-8")
+        from src.image_tagging.image_tagging import graph
+        initial_state = {
+            "image_id": image_id,
+            "image_url": image_url,
+            "image_base64": image_base64,
+            "partial_tags": [],
+        }
+        result = await graph.ainvoke(initial_state)
+        tag_record = result.get("tag_record")
+        try:
+            from src.services.supabase import SUPABASE_ENABLED, get_client
+            if SUPABASE_ENABLED and isinstance(tag_record, dict):
+                client = get_client()
+                if client:
+                    client.upsert_tag_record(
+                        image_id=image_id,
+                        tag_record=tag_record,
+                        image_url=image_url,
+                        needs_review=bool(result.get("flagged_tags")),
+                        processing_status=result.get("processing_status", "complete"),
+                    )
+        except Exception as e:
+            logger.warning("Bulk save to DB failed for %s: %s", image_id, e)
+        BATCH_STORAGE[batch_id]["results"][index] = {
+            "image_id": image_id,
+            "status": "complete",
+            "image_url": image_url,
+        }
+    except Exception as e:
+        logger.exception("Bulk process failed for file %s: %s", index, e)
+        BATCH_STORAGE[batch_id]["results"][index] = {
+            "image_id": image_id or "",
+            "status": "failed",
+            "error": str(e),
+        }
+    BATCH_STORAGE[batch_id]["completed"] += 1
+    if BATCH_STORAGE[batch_id]["completed"] >= BATCH_STORAGE[batch_id]["total"]:
+        BATCH_STORAGE[batch_id]["status"] = "complete"
+
+
+def _run_bulk_batch(request: Request, batch_id: str, file_list: list[tuple[str, bytes]]):
+    """Background: process each file and update BATCH_STORAGE."""
+    async def run():
+        for i, (filename_orig, contents) in enumerate(file_list):
+            await _process_one_file(request, filename_orig, contents, batch_id, i)
+
+    asyncio.create_task(run())
+
+
+@app.post("/api/bulk-upload")
+async def bulk_upload(request: Request, files: list[UploadFile] = File(..., alias="files")):
+    """Accept multiple images; return batch_id and start background processing."""
+    if not files:
+        raise HTTPException(status_code=400, detail="At least one file required")
+    file_list: list[tuple[str, bytes]] = []
+    for f in files:
+        contents = await f.read()
+        file_list.append((f.filename or "image.jpg", contents))
+    batch_id = str(uuid.uuid4())
+    total = len(file_list)
+    BATCH_STORAGE[batch_id] = {
+        "total": total,
+        "completed": 0,
+        "results": [{"image_id": "", "status": "pending"} for _ in range(total)],
+        "status": "processing",
+    }
+    _run_bulk_batch(request, batch_id, file_list)
+    return {"batch_id": batch_id, "total": total, "status": "processing"}
+
+
+@app.get("/api/bulk-status/{batch_id}")
+def bulk_status(batch_id: str):
+    """Return batch state: total, completed, results, status."""
+    if batch_id not in BATCH_STORAGE:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    return BATCH_STORAGE[batch_id]

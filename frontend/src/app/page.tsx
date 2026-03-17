@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { ImageUploader } from "@/components/ImageUploader";
+import { BulkUploader } from "@/components/BulkUploader";
 import { ProcessingOverlay } from "@/components/ProcessingOverlay";
 import { DashboardResult } from "@/components/DashboardResult";
 import { HistoryGrid } from "@/components/HistoryGrid";
@@ -83,6 +84,10 @@ export default function Home() {
             </div>
 
             <ImageUploader onAnalyze={handleAnalyze} disabled={isProcessing} />
+
+            <div className="mt-8">
+              <BulkUploader />
+            </div>
 
             {error && (
               <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">

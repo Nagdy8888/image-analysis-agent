@@ -28,7 +28,8 @@ flowchart TD
         O["[done] Project Setup"]
         P["[done] Components"]
         Q["[done] Integration"]
-        M --> O --> P --> Q
+        R["[done] Search + Bulk Upload"]
+        M --> O --> P --> Q --> R
     end
 
     subgraph Documentation ["Docs"]
@@ -40,4 +41,4 @@ flowchart TD
 ```
 
 **Last updated:** 2025-03-17  
-**Currently working on:** Phase 4 complete (Supabase integration + persistence)
+**Currently working on:** Phase 5 complete (Search + bulk upload)

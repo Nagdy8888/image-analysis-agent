@@ -123,6 +123,59 @@ class SupabaseClient:
         finally:
             conn.close()
 
+    def search_images_filtered(self, filters: dict, limit: int = 50) -> list[dict]:
+        """Return rows where search_index contains ALL specified values (AND logic)."""
+        flat_values: list[str] = []
+        for values in filters.values():
+            if isinstance(values, list):
+                for v in values:
+                    if isinstance(v, str) and v.strip():
+                        flat_values.append(v.strip())
+            elif isinstance(values, str) and values.strip():
+                flat_values.append(values.strip())
+        if not flat_values:
+            return self.list_tag_images(limit=limit, offset=0)
+        conn = self._conn()
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT image_id, tag_record, search_index, image_url, needs_review, processing_status, created_at, updated_at FROM image_tags WHERE search_index @> %s::text[] ORDER BY created_at DESC LIMIT %s",
+                    (flat_values, limit),
+                )
+                rows = cur.fetchall()
+            return [dict(row) for row in rows]
+        finally:
+            conn.close()
+
+    def get_available_filter_values(self, filters: dict) -> dict:
+        """From filtered results, collect unique tag values per category for cascading filters."""
+        rows = self.search_images_filtered(filters, limit=500)
+        categories: dict[str, set[str]] = {}
+        for row in rows:
+            record = row.get("tag_record")
+            if not isinstance(record, dict):
+                continue
+            for key in ("season", "theme", "design_elements", "occasion", "mood"):
+                val = record.get(key)
+                if isinstance(val, list):
+                    categories.setdefault(key, set()).update(v for v in val if isinstance(v, str))
+            for key in ("objects", "dominant_colors"):
+                val = record.get(key)
+                if isinstance(val, list):
+                    for item in val:
+                        if isinstance(item, dict):
+                            if item.get("parent"):
+                                categories.setdefault(key, set()).add(item["parent"])
+                            if item.get("child"):
+                                categories.setdefault(key, set()).add(item["child"])
+            pt = record.get("product_type")
+            if isinstance(pt, dict):
+                if pt.get("parent"):
+                    categories.setdefault("product_type", set()).add(pt["parent"])
+                if pt.get("child"):
+                    categories.setdefault("product_type", set()).add(pt["child"])
+        return {k: sorted(s) for k, s in categories.items()}
+
 
 def get_client() -> SupabaseClient | None:
     """Return a SupabaseClient if DATABASE_URI is set, else None."""
