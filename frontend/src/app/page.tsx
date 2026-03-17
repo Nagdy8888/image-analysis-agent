@@ -3,11 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ImageUploader } from "@/components/ImageUploader";
 import { ProcessingOverlay } from "@/components/ProcessingOverlay";
-import { VisionResults } from "@/components/VisionResults";
-import { TagCategories } from "@/components/TagCategories";
-import { FlaggedTags } from "@/components/FlaggedTags";
-import { JsonViewer } from "@/components/JsonViewer";
-import { Button } from "@/components/ui/button";
+import { DashboardResult } from "@/components/DashboardResult";
 import { API_BASE_URL } from "@/lib/constants";
 import type { AnalyzeImageResponse } from "@/lib/types";
 
@@ -61,48 +57,36 @@ export default function Home() {
     }
   }
 
-  function handleReset() {
+  function handleReplaceImage() {
     setAnalysisResult(null);
     setError(null);
     setCurrentStep(1);
   }
 
   return (
-    <main className="container flex min-h-[calc(100vh-3.5rem)] flex-col py-8">
-      <div className="mx-auto w-full max-w-3xl space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">Image Analysis Agent</h1>
-          <p className="mt-2 text-muted-foreground">
-            Upload an image to analyze and tag with AI.
-          </p>
-        </div>
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background">
+      <div className="container py-6">
+        {!analysisResult ? (
+          <div className="mx-auto max-w-2xl space-y-6">
+            <div className="text-center">
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                Tag Image
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Upload an image to analyze and tag with AI.
+              </p>
+            </div>
 
-        <ImageUploader onAnalyze={handleAnalyze} disabled={isProcessing} />
+            <ImageUploader onAnalyze={handleAnalyze} disabled={isProcessing} />
 
-        {error && (
-          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
-        {analysisResult && (
-          <div className="space-y-6">
-            <VisionResults data={analysisResult} />
-            {analysisResult.tags_by_category && Object.keys(analysisResult.tags_by_category).length > 0 && (
-              <TagCategories tagsByCategory={analysisResult.tags_by_category} />
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </div>
             )}
-            {analysisResult.flagged_tags && analysisResult.flagged_tags.length > 0 && (
-              <FlaggedTags flagged={analysisResult.flagged_tags} />
-            )}
-            <JsonViewer
-              data={
-                analysisResult.tag_record ?? analysisResult.vision_raw_tags
-              }
-            />
-            <Button variant="outline" onClick={handleReset}>
-              Analyze New Image
-            </Button>
           </div>
+        ) : (
+          <DashboardResult data={analysisResult} onReplaceImage={handleReplaceImage} />
         )}
       </div>
 

@@ -47,7 +47,7 @@ export function ImageUploader({ onAnalyze, disabled }: ImageUploaderProps) {
   const file = acceptedFiles[0];
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border-border/60 bg-card/80">
       <CardContent className="p-0">
         <div
           {...getRootProps()}

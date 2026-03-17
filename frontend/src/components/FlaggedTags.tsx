@@ -21,35 +21,38 @@ export function FlaggedTags({ flagged, className }: FlaggedTagsProps) {
   const [open, setOpen] = useState(true);
   if (flagged.length === 0) return null;
 
+  const label =
+    flagged.length === 1
+      ? "1 low-confidence tag"
+      : `${flagged.length} low-confidence tags`;
+
   return (
-    <div className={cn("rounded-lg border border-amber-500/40 bg-amber-500/5", className)}>
+    <div
+      className={cn(
+        "rounded-lg border border-amber-500/50 bg-amber-500/10",
+        className
+      )}
+    >
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left font-medium text-amber-800 dark:text-amber-200"
+        className="flex w-full items-center gap-2 px-4 py-3 text-left font-medium text-amber-200"
       >
         {open ? (
           <ChevronDown className="h-4 w-4" />
         ) : (
           <ChevronRight className="h-4 w-4" />
         )}
-        <AlertTriangle className="h-4 w-4" />
-        <span>{flagged.length} tag(s) need review</span>
+        <AlertTriangle className="h-4 w-4 shrink-0" />
+        <span>Flagged Tags ({label})</span>
       </button>
       {open && (
-        <ul className="border-t border-amber-500/20 px-4 py-3">
+        <ul className="flex flex-wrap gap-2 border-t border-amber-500/20 px-4 py-3">
           {flagged.map((f, i) => (
-            <li
-              key={`${f.category}-${f.value}-${i}`}
-              className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
-            >
-              <span className="font-medium text-foreground">{formatLabel(f.category)}</span>
-              <span className="text-amber-700 dark:text-amber-300">→</span>
-              <span>{formatLabel(f.value)}</span>
-              <span className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                {Math.round(f.confidence * 100)}%
+            <li key={`${f.category}-${f.value}-${i}`}>
+              <span className="inline-flex items-center rounded-md border border-amber-500/40 bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-100">
+                {formatLabel(f.value)} {Math.round(f.confidence * 100)}%
               </span>
-              <span className="text-xs italic">{f.reason.replace("_", " ")}</span>
             </li>
           ))}
         </ul>

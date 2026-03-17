@@ -27,11 +27,11 @@ export function ProcessingOverlay({ isVisible, currentStep }: ProcessingOverlayP
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col gap-6 rounded-lg border bg-card p-8 shadow-lg"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col gap-6 rounded-xl border border-border/60 bg-card/95 p-8 shadow-xl backdrop-blur"
+        >
             {STEPS.map((step, index) => {
               const isActive = index + 1 === currentStep;
               const isComplete = index + 1 < currentStep;
