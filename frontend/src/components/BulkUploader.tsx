@@ -206,9 +206,9 @@ export function BulkUploader() {
                 <Button variant="outline" size="sm" onClick={reset}>
                   Upload more
                 </Button>
-                <Button size="sm" asChild>
-                  <Link href="/">View in history</Link>
-                </Button>
+                <Link href="/">
+                  <Button size="sm">View in history</Button>
+                </Link>
               </div>
             )}
           </div>
