@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TagCategoryCard } from "@/components/TagCategoryCard";
 import type { AnalyzeImageResponse } from "@/lib/types";
 
 interface VisionResultsProps {
@@ -11,8 +12,9 @@ interface VisionResultsProps {
 }
 
 export function VisionResults({ data }: VisionResultsProps) {
-  const { image_url, vision_description, vision_raw_tags } = data;
+  const { image_url, vision_description, vision_raw_tags, partial_tags } = data;
   const tags = vision_raw_tags || {};
+  const pipelineTags = partial_tags ?? [];
 
   return (
     <motion.div
@@ -100,6 +102,17 @@ export function VisionResults({ data }: VisionResultsProps) {
           ) : null}
         </CardContent>
       </Card>
+
+      {pipelineTags.length > 0 && (
+        <div className="space-y-4 md:col-span-2">
+          <h2 className="text-lg font-semibold">Pipeline tags</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {pipelineTags.map((result) => (
+              <TagCategoryCard key={result.category} result={result} />
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

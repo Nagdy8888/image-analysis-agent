@@ -5,22 +5,22 @@ flowchart TD
     subgraph Backend ["Backend Agent"]
         A["[done] Project Setup"]
         B["[done] Settings and Config"]
-        C["[ ] Taxonomy"]
-        D["[ ] Schemas"]
-        E["[ ] Prompts"]
+        C["[done] Taxonomy"]
+        D["[done] Schemas"]
+        E["[done] Prompts"]
         F["[ ] Supabase Service"]
-        G["[ ] Preprocessor Node"]
-        H["[ ] Vision Node"]
-        I["[ ] Tagger Nodes"]
+        G["[done] Preprocessor Node"]
+        H["[done] Vision Node"]
+        I["[done] Tagger Nodes"]
         J["[ ] Validator plus Filter plus Aggregator"]
-        K["[ ] Graph Builder"]
-        L["[ ] Entry Point"]
+        K["[done] Graph Builder"]
+        L["[done] Entry Point"]
         A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L
     end
 
     subgraph API ["API Layer"]
         M["[done] FastAPI Server"]
-        N["[ ] Docker"]
+        N["[done] Docker"]
         L --> M --> N
     end
 
@@ -40,4 +40,4 @@ flowchart TD
 ```
 
 **Last updated:** 2025-03-17  
-**Currently working on:** Phase 1 complete; Phase 2 next
+**Currently working on:** Phase 2 complete; Phase 3 (parallel taggers, validator, filter, aggregator) next
