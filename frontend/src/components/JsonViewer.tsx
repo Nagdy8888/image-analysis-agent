@@ -5,10 +5,11 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface JsonViewerProps {
-  data: Record<string, unknown>;
+  data?: Record<string, unknown> | object | null;
 }
 
 export function JsonViewer({ data }: JsonViewerProps) {
+  const obj = data != null && typeof data === "object" ? data : {};
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -27,7 +28,7 @@ export function JsonViewer({ data }: JsonViewerProps) {
       </Button>
       {expanded && (
         <pre className="max-h-[400px] overflow-auto rounded-b-lg border-t bg-zinc-950 p-4 text-xs text-zinc-100">
-          <code>{JSON.stringify(data, null, 2)}</code>
+          <code>{JSON.stringify(obj, null, 2)}</code>
         </pre>
       )}
     </div>
