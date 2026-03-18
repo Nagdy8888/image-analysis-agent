@@ -1,28 +1,47 @@
 # Image Analysis Agent
 
-AI-powered image tagging: upload product images, get structured tags (season, theme, colors, objects, etc.) via **LangGraph** and **OpenAI GPT-4o**, optionally store in **Supabase**, and search in the UI. Supports single and bulk upload with progress tracking.
+AI-powered image tagging for product imagery. Upload images, get structured tags (season, theme, colors, objects, and more) via **LangGraph** and **OpenAI GPT-4o**, store results in **Supabase**, and search or browse them in a modern web UI.
+
+---
 
 ## Features
 
-- **Single image:** Upload → vision analysis → 8 category taggers (season, theme, objects, dominant colors, design elements, occasion, mood, product type) → validation and confidence filter → tag record and optional DB save.
-- **Bulk upload:** Multiple images, background processing, progress bar and per-file status.
-- **Search:** Filter by tags (cascading filters), grid results, detail modal with full tag record.
-- **History:** Recently tagged images grid with refresh.
+| Feature | Description |
+|--------|--------------|
+| **Single image analysis** | Upload one image → vision analysis → 8 category taggers (season, theme, objects, dominant colors, design elements, occasion, mood, product type) → validation and confidence scoring → tag record with optional DB save. |
+| **Bulk upload** | Process multiple images in the background with a progress bar and per-file status. |
+| **Search** | Filter by tags with cascading filters, view results in a grid, and open a detail modal with the full tag record. |
+| **History** | Browse recently tagged images and refresh the list on demand. |
 
-## Run with Docker
+---
 
-From the repo root:
+## Quick start
+
+**Prerequisites:** Docker and Docker Compose. For local runs: Python 3.11+, Node.js 20+.
+
+From the repository root:
 
 ```bash
 docker compose up --build
 ```
 
-- **App:** http://localhost:3000  
-- **API:** http://localhost:8000  
+| Service | URL |
+|--------|-----|
+| **App** | http://localhost:3000 |
+| **API** | http://localhost:8000 |
 
-Set `OPENAI_API_KEY` (and optionally `DATABASE_URI` for Supabase) in a `.env` file at the project root. See [docs/quickstart/DOCKER_SETUP.md](docs/quickstart/DOCKER_SETUP.md) for full Docker instructions and env vars.
+Create a `.env` file at the project root with:
 
-## Architecture (high level)
+- `OPENAI_API_KEY` — required for analysis.
+- `DATABASE_URI` — optional; enables persistence and search (Supabase/PostgreSQL).
+
+See [Docker setup](docs/quickstart/DOCKER_SETUP.md) and [local setup](docs/quickstart/SETUP.md) for details.
+
+---
+
+## Architecture
+
+**High-level:**
 
 ```mermaid
 flowchart LR
@@ -32,5 +51,121 @@ flowchart LR
   B --> E[Supabase]
 ```
 
-- **Stack:** Next.js 16, React 19, Tailwind, shadcn/ui | FastAPI, LangGraph, langchain-openai | Supabase (PostgreSQL).
-- **Docs:** [Quickstart](docs/quickstart/README.md) · [Architecture](docs/architecture/README.md) · [Phase plans](docs/plans/README.md) · [Curriculum](docs/curriculum/README.md) · [Changelog](CHANGELOG.md)
+**Agent pipeline (LangGraph):** preprocessor → vision → 8 parallel taggers → validator → confidence filter → aggregator → END.
+
+```mermaid
+flowchart TD
+    START([START]) --> A[image_preprocessor]
+    A --> B[vision_analyzer]
+    B --> C1[tag_season]
+    B --> C2[tag_theme]
+    B --> C3[tag_objects]
+    B --> C4[tag_colors]
+    B --> C5[tag_design]
+    B --> C6[tag_occasion]
+    B --> C7[tag_mood]
+    B --> C8[tag_product]
+    C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 --> D[tag_validator]
+    D --> E[confidence_filter]
+    E --> F[tag_aggregator]
+    F --> END_NODE([END])
+    subgraph parallel["Parallel taggers"]
+        C1
+        C2
+        C3
+        C4
+        C5
+        C6
+        C7
+        C8
+    end
+```
+
+**Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS · shadcn/ui · FastAPI · LangGraph · langchain-openai · Supabase (PostgreSQL).  
+Full pipeline description: [GRAPH_STRUCTURE.md](docs/architecture/GRAPH_STRUCTURE.md).
+
+---
+
+## Documentation
+
+| Section | Description |
+|--------|-------------|
+| [Quickstart](docs/quickstart/README.md) | Get running with Docker or locally. |
+| [Architecture](docs/architecture/README.md) | System design, graph structure, API, database, frontend. |
+| [Phase plans](docs/plans/README.md) | Implementation guides for each phase. |
+| [Curriculum](docs/curriculum/README.md) | Learning path for new engineers. |
+| [Changelog](CHANGELOG.md) | Summary of phases and features. |
+
+---
+
+## Repository structure
+
+```
+image-analysis-agent/
+├── backend/                      # FastAPI + LangGraph agent
+│   ├── src/
+│   │   ├── server.py              # FastAPI app, routes, static /uploads
+│   │   ├── image_tagging/         # LangGraph agent package
+│   │   │   ├── image_tagging.py   # Compiled graph export
+│   │   │   ├── graph_builder.py   # Graph nodes and edges
+│   │   │   ├── taxonomy.py        # Tag categories and allowed values
+│   │   │   ├── configuration.py  # Thresholds, overrides
+│   │   │   ├── settings.py        # Env vars (OpenAI, etc.)
+│   │   │   ├── nodes/             # Graph nodes
+│   │   │   │   ├── preprocessor.py
+│   │   │   │   ├── vision.py
+│   │   │   │   ├── taggers.py     # 8 category taggers
+│   │   │   │   ├── validator.py
+│   │   │   │   ├── confidence.py
+│   │   │   │   └── aggregator.py
+│   │   │   ├── prompts/           # System and tagger prompts
+│   │   │   ├── schemas/           # State and data models
+│   │   │   └── tools/             # Agent tools (placeholder)
+│   │   └── services/
+│   │       └── supabase/          # DB client, migration, settings
+│   ├── uploads/                   # Stored images (created at runtime)
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── .dockerignore
+│
+├── frontend/                      # Next.js dashboard
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx           # Home: upload, result, history, bulk
+│   │   │   ├── search/page.tsx    # Search page
+│   │   │   ├── layout.tsx
+│   │   │   ├── error.tsx
+│   │   │   └── globals.css
+│   │   ├── components/            # UI components
+│   │   │   ├── ImageUploader.tsx
+│   │   │   ├── BulkUploader.tsx
+│   │   │   ├── DashboardResult.tsx
+│   │   │   ├── FilterSidebar.tsx
+│   │   │   ├── SearchResults.tsx
+│   │   │   ├── DetailModal.tsx
+│   │   │   ├── HistoryGrid.tsx
+│   │   │   ├── TagCategories.tsx
+│   │   │   ├── FlaggedTags.tsx
+│   │   │   └── ui/               # shadcn (button, card, skeleton, etc.)
+│   │   └── lib/                   # types, constants, formatTag, utils
+│   ├── public/
+│   ├── package.json
+│   ├── Dockerfile
+│   └── .dockerignore
+│
+├── docs/
+│   ├── quickstart/                # SETUP.md, DOCKER_SETUP.md
+│   ├── architecture/              # OVERVIEW, GRAPH_STRUCTURE, API, DB, etc.
+│   ├── plans/                     # phase-0-setup.md … phase-6-setup.md
+│   ├── curriculum/                # 01–06 lessons + README
+│   ├── reports/                   # PROGRESS, PROJECT_SUMMARY, FEATURES, DECISIONS
+│   └── errors/                    # Error log
+│
+├── docker-compose.yml
+├── .env                            # OPENAI_API_KEY, DATABASE_URI (create as needed)
+├── CHANGELOG.md
+├── FOLDER_STRUCTURE.md             # LangGraph layout conventions
+└── README.md
+```
+
+For layout conventions and design principles, see [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md). For system design, see the [architecture overview](docs/architecture/OVERVIEW.md).
