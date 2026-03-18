@@ -78,7 +78,7 @@ flowchart TB
   T -->|partial_tags reducer| Val
   Val -->|validated_tags flagged_tags| C
   C -->|validated_tags flagged_tags needs_review| A
-  A -->|tag_record processing_status|
+  A -->|tag_record processing_status| Out[final state]
 ```
 
 | Field | preprocessor | vision | taggers | validator | confidence | aggregator |
