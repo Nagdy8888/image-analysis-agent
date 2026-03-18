@@ -15,6 +15,26 @@ AI-powered image tagging for product imagery. Upload images, get structured tags
 
 ---
 
+## Screenshots
+
+1. **Home — before upload**
+
+   <img src="docs/media/01-home-before-upload.png" alt="Home before upload" width="800">
+
+2. **Analyzing**
+
+   <img src="docs/media/02-analyzing.png" alt="Analyzing image" width="800">
+
+3. **Analysis result**
+
+   <img src="docs/media/03-analysis-result.png" alt="Analysis result" width="800">
+
+4. **Search page**
+
+   <img src="docs/media/04-search-page.png" alt="Search page" width="800">
+
+---
+
 ## Quick start
 
 **Prerequisites:** Docker and Docker Compose. For local runs: Python 3.11+, Node.js 20+.
@@ -90,6 +110,7 @@ Full pipeline description: [GRAPH_STRUCTURE.md](docs/architecture/GRAPH_STRUCTUR
 
 | Section | Description |
 |--------|-------------|
+| [**documentation/**](documentation/README.md) | Exhaustive reference: 20 numbered docs (agent state, nodes, taxonomy, API, DB, frontend, Docker, phases). |
 | [Quickstart](docs/quickstart/README.md) | Get running with Docker or locally. |
 | [Architecture](docs/architecture/README.md) | System design, graph structure, API, database, frontend. |
 | [Phase plans](docs/plans/README.md) | Implementation guides for each phase. |
@@ -152,6 +173,12 @@ image-analysis-agent/
 │   ├── package.json
 │   ├── Dockerfile
 │   └── .dockerignore
+│
+├── documentation/                 # Exhaustive reference (20 numbered .md files)
+│   ├── README.md                  # Contents table + links to 01–20
+│   ├── 01-project-overview.md
+│   ├── 02-architecture.md … 20-development-phases.md
+│   └── …
 │
 ├── docs/
 │   ├── quickstart/                # SETUP.md, DOCKER_SETUP.md
