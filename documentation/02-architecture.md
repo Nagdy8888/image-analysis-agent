@@ -81,7 +81,7 @@ sequenceDiagram
     FastAPI->>FastAPI: _process_one_file: save, graph.ainvoke, optional DB upsert
     FastAPI->>FastAPI: Update BATCH_STORAGE[batch_id].results[i], completed++
   end
-  NextJS-->>User: Progress bar, per-file status; when done, "View in history"
+  NextJS-->>User: Progress bar and per-file status; when done View in history
 ```
 
 - Frontend sends all files in one request; server reads body immediately and stores `(filename, contents)` so the background task does not depend on request stream.
