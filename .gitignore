@@ -35,8 +35,10 @@ npm-debug.log*
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Docs (local only — not pushed to GitHub)
-docs/
+# Docs: only curriculum is committed; other subfolders are local only
+docs/*
+!docs/curriculum/
+!docs/curriculum/**
 
 # Testing and coverage
 .coverage
