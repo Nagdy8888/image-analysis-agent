@@ -33,6 +33,10 @@ AI-powered image tagging for product imagery. Upload images, get structured tags
 
    <img src="docs/media/04-search-page.png" alt="Search page" width="800">
 
+5. **Search — using filters**
+
+   <img src="docs/media/05-search-filters.png" alt="Search page with filters" width="800">
+
 ---
 
 ## Quick start
