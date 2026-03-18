@@ -35,10 +35,12 @@ npm-debug.log*
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Docs: only curriculum is committed; other subfolders are local only
+# Docs: curriculum and code-walkthrough are committed; other subfolders are local only
 docs/*
 !docs/curriculum/
 !docs/curriculum/**
+!docs/code-walkthrough/
+!docs/code-walkthrough/**
 
 # Testing and coverage
 .coverage
