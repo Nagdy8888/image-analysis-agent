@@ -35,6 +35,9 @@ npm-debug.log*
 backend/uploads/*
 !backend/uploads/.gitkeep
 
+# Docs (local only — not pushed to GitHub)
+docs/
+
 # Testing and coverage
 .coverage
 htmlcov/

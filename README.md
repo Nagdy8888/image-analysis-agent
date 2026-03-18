@@ -19,23 +19,23 @@ AI-powered image tagging for product imagery. Upload images, get structured tags
 
 1. **Home — before upload**
 
-   <img src="docs/media/01-home-before-upload.png" alt="Home before upload" width="800">
+   <img src="screenshots/01-home-before-upload.png" alt="Home before upload" width="800">
 
 2. **Analyzing**
 
-   <img src="docs/media/02-analyzing.png" alt="Analyzing image" width="800">
+   <img src="screenshots/02-analyzing.png" alt="Analyzing image" width="800">
 
 3. **Analysis result**
 
-   <img src="docs/media/03-analysis-result.png" alt="Analysis result" width="800">
+   <img src="screenshots/03-analysis-result.png" alt="Analysis result" width="800">
 
 4. **Search page**
 
-   <img src="docs/media/04-search-page.png" alt="Search page" width="800">
+   <img src="screenshots/04-search-page.png" alt="Search page" width="800">
 
 5. **Search — using filters**
 
-   <img src="docs/media/05-search-filters.png" alt="Search page with filters" width="800">
+   <img src="screenshots/05-search-filters.png" alt="Search page with filters" width="800">
 
 ---
 
