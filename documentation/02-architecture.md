@@ -67,21 +67,21 @@ sequenceDiagram
   participant Graph
   participant DB
 
-  User->>NextJS: Select multiple files, Start bulk analysis
-  NextJS->>FastAPI: POST /api/bulk-upload (multipart files)
+  User->>NextJS: Select files and start bulk analysis
+  NextJS->>FastAPI: POST bulk-upload multipart
   Note over FastAPI: Read all file contents into memory
-  FastAPI->>FastAPI: Create batch_id, init BATCH_STORAGE[batch_id]
+  FastAPI->>FastAPI: Create batch_id and BATCH_STORAGE
   FastAPI->>FastAPI: Spawn background _run_bulk_batch
-  FastAPI-->>NextJS: { batch_id, total, status: processing }
+  FastAPI-->>NextJS: batch_id total status processing
   loop Poll
-    NextJS->>FastAPI: GET /api/bulk-status/{batch_id}
-    FastAPI-->>NextJS: { total, completed, results[], status }
+    NextJS->>FastAPI: GET bulk-status by batch_id
+    FastAPI-->>NextJS: total completed results status
   end
   par For each file
-    FastAPI->>FastAPI: _process_one_file: save, graph.ainvoke, optional DB upsert
-    FastAPI->>FastAPI: Update BATCH_STORAGE[batch_id].results[i], completed++
+    FastAPI->>FastAPI: _process_one_file save graph DB upsert
+    FastAPI->>FastAPI: Update BATCH_STORAGE results and completed
   end
-  NextJS-->>User: Progress bar and per-file status; when done View in history
+  NextJS-->>User: Progress bar and per-file status when done
 ```
 
 - Frontend sends all files in one request; server reads body immediately and stores `(filename, contents)` so the background task does not depend on request stream.
